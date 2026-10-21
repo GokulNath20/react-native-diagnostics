@@ -2,12 +2,12 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "react-native-native-diagnostics": ["./src/index"]
+      "react-native-diagnostics": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "customConditions": [
-      "react-native-native-diagnostics-source",
+      "react-native-diagnostics-source",
       "react-native-strict-api"
     ],
     "esModuleInterop": true,

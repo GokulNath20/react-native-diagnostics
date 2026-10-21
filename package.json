@@ -1,12 +1,12 @@
 {
-  "name": "react-native-native-diagnostics",
+  "name": "react-native-diagnostics",
   "version": "0.1.0",
-  "description": "Lightweight native diagnostics for React Native: battery, memory, CPU, thermal state, FPS and startup time via a typed TurboModule.",
+  "description": "Lightweight native diagnostics for React Native: battery, memory, CPU, thermal state, disk space, FPS and startup time via a typed TurboModule.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
     ".": {
-      "react-native-native-diagnostics-source": "./src/index.tsx",
+      "react-native-diagnostics-source": "./src/index.tsx",
       "types": "./lib/typescript/src/index.d.ts",
       "default": "./lib/module/index.js"
     },
@@ -32,7 +32,7 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace react-native-native-diagnostics-example",
+    "example": "yarn workspace react-native-diagnostics-example",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build",
     "typecheck": "tsc",
@@ -49,14 +49,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GokulNath20/react-native-native-diagnostics.git"
+    "url": "git+https://github.com/GokulNath20/react-native-diagnostics.git"
   },
   "author": "Gokul Nath <gkvina20@gmail.com> (https://github.com/GokulNath20)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/GokulNath20/react-native-native-diagnostics/issues"
+    "url": "https://github.com/GokulNath20/react-native-diagnostics/issues"
   },
-  "homepage": "https://github.com/GokulNath20/react-native-native-diagnostics#readme",
+  "homepage": "https://github.com/GokulNath20/react-native-diagnostics#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -90,7 +90,7 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": ">=0.80.0"
   },
   "workspaces": [
     "example"

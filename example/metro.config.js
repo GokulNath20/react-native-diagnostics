@@ -13,7 +13,7 @@ const root = path.resolve(__dirname, '..');
 const config = withMetroConfig(getDefaultConfig(__dirname), {
   root,
   dirname: __dirname,
-  conditions: ['react-native-native-diagnostics-source'],
+  conditions: ['react-native-diagnostics-source'],
 });
 
 module.exports = config;

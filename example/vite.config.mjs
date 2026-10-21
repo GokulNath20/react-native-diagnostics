@@ -9,7 +9,7 @@ export default defineConfig((env) =>
       alias: {
         [pack.name]: new URL('..', import.meta.url),
       },
-      conditions: ['react-native-native-diagnostics-source'],
+      conditions: ['react-native-diagnostics-source'],
       dedupe: Object.keys(pack.peerDependencies),
     },
   })

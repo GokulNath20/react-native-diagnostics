@@ -1,5 +1,5 @@
 #import <NativeDiagnosticsSpec/NativeDiagnosticsSpec.h>
 
-@interface NativeDiagnostics : NSObject <NativeNativeDiagnosticsSpec>
+@interface NativeDiagnostics : NativeNativeDiagnosticsSpecBase <NativeNativeDiagnosticsSpec>
 
 @end
