@@ -6,6 +6,7 @@ Add one line to your app and a see-through overlay shows every value live on top
 
 ## Requirements
 
+- iOS and Android. Web isn't supported, because the diagnostics come from native code.
 - React Native 0.80 or newer
 - The New Architecture (the default since React Native 0.76). The old architecture is not supported.
 
