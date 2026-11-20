@@ -20,3 +20,8 @@ export { useFps } from './fps';
 export type { UseFpsOptions } from './fps';
 export { useJsFps } from './jsFps';
 export type { JsFps, UseJsFpsOptions } from './jsFps';
+export { DiagnosticsOverlay } from './DiagnosticsOverlay';
+export type {
+  DiagnosticsOverlayPosition,
+  DiagnosticsOverlayProps,
+} from './DiagnosticsOverlay';
