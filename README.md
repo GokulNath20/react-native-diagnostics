@@ -2,6 +2,8 @@
 
 Lightweight native diagnostics for React Native: battery, memory, CPU, thermal state, disk space, FPS and startup time via a typed TurboModule.
 
+Add one line to your app and a see-through overlay shows every value live on top of your screens while you develop and test. Or use the hooks to build your own UI. See the [Quick start](#quick-start).
+
 ## Requirements
 
 - React Native 0.80 or newer
@@ -31,11 +33,13 @@ No config plugin is needed.
 
 `getFreeDiskStorage` uses a disk space API that Apple requires a reason for. The library ships its own `PrivacyInfo.xcprivacy` declaring it with reasons `85F4.1` (showing disk space to the user) and `E174.1` (checking for space before writing files), and React Native merges it into your app's manifest during `pod install`. You don't need to do anything unless you use the value for another purpose, such as sending it in a bug report (`7D9E.1`). In that case, add that reason to your app's `PrivacyInfo.xcprivacy`. See [Apple's documentation](https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api) for the full list.
 
-## Usage
+## Quick start
 
-### Floating overlay
+The fastest way to use the library is the built-in overlay: a see-through panel that floats above every screen and shows all the diagnostics live while you use your app.
 
-The quickest way to see everything: render `DiagnosticsOverlay` once at the root of your app, after your navigator. It floats above every screen, so you can watch the values change live as you navigate and test features.
+**1. Install the package** and rebuild your app (see [Installation](#installation)).
+
+**2. Add one line at the root of your app**, after your navigator, so the overlay sits above every screen:
 
 ```tsx
 import { DiagnosticsOverlay } from 'react-native-diagnostics';
@@ -50,15 +54,180 @@ export default function App() {
 }
 ```
 
-- Shows UI and JS FPS with a 30-second history chart, plus CPU, memory, longest JS frame, JS stalls, thermal state, battery, low power mode, free disk and startup time.
-- Values are colour-coded green, amber or red, and the status dot shows the worst of FPS, CPU and thermal state.
-- Drag it anywhere; it snaps to the nearest side. Tap the header to collapse it to a small pill showing FPS and memory, and tap the pill to expand it.
-- The panel is see-through, so your own screen stays visible underneath. Raise or lower that with `backgroundOpacity`. Touches outside the panel go straight to your app.
-- With `enabled={false}` it renders nothing and stops all monitoring.
+With Expo Router, put it in your root layout, `app/_layout.tsx`:
 
-### Your own UI
+```tsx
+import { Stack } from 'expo-router';
+import { DiagnosticsOverlay } from 'react-native-diagnostics';
 
-To build your own UI or send the values to your analytics, use the hooks directly:
+export default function RootLayout() {
+  return (
+    <>
+      <Stack />
+      <DiagnosticsOverlay enabled={__DEV__} />
+    </>
+  );
+}
+```
+
+**3. Run a debug build.** The panel appears in the top-right corner. Navigate through your app and test features as usual; the values update live.
+
+### What the overlay shows
+
+| Value         | Meaning                                                                                    |
+| ------------- | ------------------------------------------------------------------------------------------ |
+| **UI FPS**    | Native frame rate. Drops when rendering or animations are too heavy.                       |
+| **JS FPS**    | How smoothly the JS thread runs. Drops when JavaScript blocks, e.g. a heavy render or loop. |
+| **CPU**       | CPU used by your app, as a percentage of one core (can exceed 100 on multi-core devices).  |
+| **Memory**    | Memory used by your app process.                                                            |
+| **JS frame**  | Longest gap between two JS frames in the last second.                                       |
+| **JS stalls** | Number of JS freezes of 100 ms or more since the overlay appeared.                          |
+| **Thermal**   | How hot the device is: `nominal`, `fair`, `serious` or `critical`.                          |
+| **Battery**   | Battery level and charging state. `n/a` on simulators, which have no battery.               |
+| **Low power** | Whether iOS Low Power Mode or Android Battery Saver is on.                                  |
+| **Disk free** | Free storage available to your app.                                                         |
+| **Startup**   | Time from process start until the overlay first rendered.                                   |
+
+Values are green when healthy, amber when worth a look and red when there's a problem. The dot next to **DIAGNOSTICS** shows the worst of FPS, CPU and thermal state, so you can tell at a glance whether something is wrong. The bars under each FPS value show the last 30 seconds.
+
+### Using the overlay
+
+- **Move it:** drag the panel anywhere. It snaps to the nearest side of the screen.
+- **Shrink it:** tap the header to collapse it to a small pill showing FPS and memory. Tap the pill to expand it again.
+- **See through it:** the panel is see-through so your own screen stays visible underneath, and touches outside the panel go straight to your app.
+
+## Turning the overlay on and off
+
+The overlay is controlled by its `enabled` prop. When `enabled` is `false`, the overlay renders nothing and stops all monitoring: no polling, no native FPS tracking and no frame callbacks. It costs nothing while off.
+
+### Development builds only (recommended)
+
+```tsx
+<DiagnosticsOverlay enabled={__DEV__} />
+```
+
+`__DEV__` is `true` in debug builds and `false` in release builds, so the overlay never appears for your users.
+
+### Toggle it from the dev menu
+
+Add a **Toggle diagnostics** item to the React Native dev menu (shake the device, or press <kbd>Cmd</kbd>+<kbd>D</kbd> on the iOS simulator or <kbd>Cmd</kbd>+<kbd>M</kbd> on the Android emulator):
+
+```tsx
+import { useEffect, useState } from 'react';
+import { DevSettings } from 'react-native';
+import { DiagnosticsOverlay } from 'react-native-diagnostics';
+
+export default function App() {
+  const [showDiagnostics, setShowDiagnostics] = useState(__DEV__);
+
+  useEffect(() => {
+    // Does nothing in release builds.
+    DevSettings.addMenuItem('Toggle diagnostics', () =>
+      setShowDiagnostics((show) => !show)
+    );
+  }, []);
+
+  return (
+    <>
+      <NavigationContainer>{/* your screens */}</NavigationContainer>
+      <DiagnosticsOverlay enabled={showDiagnostics} />
+    </>
+  );
+}
+```
+
+### Internal or QA release builds
+
+To show the overlay in a release build for testers (for example a TestFlight or internal track build) but not in your store build, pass any flag you set at build time. With Expo:
+
+```tsx
+<DiagnosticsOverlay
+  enabled={process.env.EXPO_PUBLIC_SHOW_DIAGNOSTICS === 'true'}
+/>
+```
+
+Then set the variable only in the build profile your testers get, in `eas.json`:
+
+```json
+{
+  "build": {
+    "preview": {
+      "env": { "EXPO_PUBLIC_SHOW_DIAGNOSTICS": "true" }
+    }
+  }
+}
+```
+
+In a bare React Native app, use whatever you already use for build-time configuration, such as [react-native-config](https://github.com/lugg/react-native-config).
+
+### Always on
+
+`enabled` defaults to `true`, so `<DiagnosticsOverlay />` on its own is always shown, including in release builds. Use this only for internal apps.
+
+### Removing it
+
+Delete the `<DiagnosticsOverlay />` line. Nothing else needs to change.
+
+## Customising the overlay
+
+```tsx
+<DiagnosticsOverlay
+  enabled={__DEV__}
+  position="bottom-left" // start in another corner
+  initiallyCollapsed // start as the small pill
+  backgroundOpacity={0.8} // 0 = fully see-through, 1 = solid
+  options={{
+    metrics: { disk: false, battery: false }, // hide metrics you don't need
+    memoryIntervalMs: 2000, // poll memory more often
+  }}
+/>
+```
+
+The overlay keeps clear of the status bar and home indicator using typical sizes. If your app has a custom header or you use [react-native-safe-area-context](https://github.com/AppAndFlow/react-native-safe-area-context), pass exact insets:
+
+```tsx
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+function Diagnostics() {
+  const insets = useSafeAreaInsets();
+  return (
+    <DiagnosticsOverlay
+      enabled={__DEV__}
+      insets={{ top: insets.top + 8, bottom: insets.bottom + 8 }}
+    />
+  );
+}
+```
+
+`useSafeAreaInsets` must be called inside `SafeAreaProvider`. See [`<DiagnosticsOverlay />`](#diagnosticsoverlay-) for every prop.
+
+## Troubleshooting
+
+**The overlay doesn't appear.**
+
+- Check that `enabled` is `true`. `__DEV__` is `false` in release builds.
+- Render it at the root of your app, after your navigator, not inside a screen or a `ScrollView`.
+- React Native's `Modal` and native modal screens (for example native-stack modals on iOS) are drawn above the overlay, because it lives inside your React tree.
+
+**The app shows "'NativeDiagnostics' could not be found".**
+
+The native code isn't in your build yet. Run `pod install` in `ios/` and rebuild the app; a JS reload isn't enough. The library needs the New Architecture and doesn't work in Expo Go.
+
+**The panel covers my header or sits under the notch.**
+
+Drag it out of the way, start it in another corner with `position`, or pass exact `insets` (see [Customising the overlay](#customising-the-overlay)).
+
+**A value shows `--`.**
+
+FPS and JS frame need about a second of frames before the first reading. Any other value shows `--` when the device can't report it.
+
+**FPS looks low in development.**
+
+Debug builds run JavaScript much more slowly than release builds. Use the overlay in development to spot relative changes, and check a release build for real-world numbers.
+
+## Using the hooks directly
+
+To build your own UI, log the values or send them to your analytics, use the hooks and functions directly:
 
 ```tsx
 import { useDiagnostics, useFps } from 'react-native-diagnostics';
@@ -70,6 +239,8 @@ function PerformanceBadge() {
   // ...
 }
 ```
+
+The hooks and functions are described in the [API](#api) below.
 
 ## API
 
