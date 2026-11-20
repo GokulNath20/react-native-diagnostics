@@ -45,7 +45,19 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "diagnostics",
+    "performance",
+    "monitoring",
+    "fps",
+    "battery",
+    "memory",
+    "cpu",
+    "thermal",
+    "disk-space",
+    "startup-time",
+    "turbo-module",
+    "new-architecture"
   ],
   "repository": {
     "type": "git",
@@ -70,6 +82,7 @@
     "@react-native/eslint-config": "0.86.2",
     "@react-native/jest-preset": "0.86.2",
     "@release-it/conventional-changelog": "^12.0.0",
+    "@testing-library/react-native": "^14.1.0",
     "@types/react": "^19.2.0",
     "commitlint": "^21.2.1",
     "del-cli": "^7.0.0",
@@ -85,6 +98,7 @@
     "react-native-builder-bob": "^0.43.2",
     "react-native-web": "~0.21.2",
     "release-it": "^21.0.1",
+    "test-renderer": "^1.0.0",
     "turbo": "^2.10.8",
     "typescript": "^6.0.3"
   },
@@ -135,7 +149,7 @@
       "customExportConditions": [
         "require",
         "react-native",
-        "<%- project.sourceCondition -%>"
+        "react-native-diagnostics-source"
       ]
     },
     "modulePathIgnorePatterns": [
