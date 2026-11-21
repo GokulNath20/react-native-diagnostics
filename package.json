@@ -1,6 +1,6 @@
 {
   "name": "react-native-diagnostics",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Lightweight native diagnostics for React Native: battery, memory, CPU, thermal state, disk space, FPS and startup time via a typed TurboModule.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
